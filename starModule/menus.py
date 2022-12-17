@@ -30,8 +30,9 @@ def maxMinMean(mode):
     start = int(input('Digite o ano de início: '))
     end = int(input('digite o ano final da consulta: '))
 
-    if(start < 1818 or end > 2022 or end > 1818):
-        while(start < 1818 or end > 2022):
+    if(start < 1749 or end > 2022 or start > end):
+        while(start < 1749 or end > 2022 or start > end):
+            os.system(CLEAR_COMMAND)
             print('Os anos selecionados estão fora do range de anos')
             print('Digite anos entre 1818 e 2022')
             start = int(input('Digite o ano de início: '))
@@ -66,6 +67,7 @@ def menuMaxMin(mode):
 
     if(start < 1818 or end > 2022 or startMonth < 1 or startMonth > 12 or endMonth < 1 or endMonth > 12 or end > 1818):
         while(start < 1818 or end > 2022):
+            os.system(CLEAR_COMMAND)
             print('Os anos selecionados estão fora do range de anos')
             print('Digite anos entre 1818 e 2022')
             start = int(input('Digite o ano de início: '))
@@ -112,6 +114,7 @@ def menuConsulta():
         print('6 - Sair')
         option = int(input('Digite a opção: '))
 
+        
 
         if(option == 1):
             menuMaxMin('max')
@@ -137,6 +140,30 @@ def menuConsulta():
         os.system(CLEAR_COMMAND)
 #-----------------------------------------------------------------
 
+#------------------------------------------------------------------
+#FUNÇÕES NECESSÁRIAS PARA GERAR GRÁFICO
+
+def plotGraphMenu():
+    os.system(CLEAR_COMMAND)
+    start = int(input('Digite o ano de início do gráfico: '))
+    end = int(input('Digite o ano final do gráfico: '))
+
+    if(start > end or start < 1818 or end > 2022):
+        print('Anos fora do limite, digite anos entre 1818 e 2022.')
+        while(start > end or start < 1818 or end > 2022):
+                os.system(CLEAR_COMMAND)
+                print('Anos fora do limite, digite anos entre 1818 e 2022.')
+                start = int(input('Digite o ano de início do gráfico: '))
+                end = int(input('Digite o ano final do gráfico: '))
+    
+    data = starFunctions.dataForGraph(DAILY, MONTHLY, start, end)
+    title = starFunctions.createGraph(data)
+
+    print(f'O gráfico foi salvo com o título {title}')
+    input('Aperte Enter para continuar')
+
+#------------------------------------------------------------------
+
 #-----------------------------------------------------------------
 def menuPrincipal():
     option = 0
@@ -156,7 +183,9 @@ def menuPrincipal():
         option = int(input('Digite a opção desejada:'))
         if(option == 1):
             menuConsulta()
-        if(option == 3):
+        elif(option == 2):
+            plotGraphMenu()
+        elif(option == 3):
             sys.exit()
         else:
             print('Opção não existente')

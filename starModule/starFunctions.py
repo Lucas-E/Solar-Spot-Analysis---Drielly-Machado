@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+import datetime
 
 #--------------------------------------------------------------
 #configuring root dir
@@ -159,3 +161,167 @@ def minMeanByInterval(start, end, monthly):
                     minimum['min'] = float(value)
         return minimum
 #------------------------------------------------------------------
+
+#------------------------------------------------------------------
+
+def smoothedMeanByInterval(start, end, monthly):
+    if(str(start) in monthly.keys() and str(end) in monthly.keys()):
+        a = {}
+    
+        months = []
+
+        means=[]
+
+        result = {}
+
+        years = list(monthly.keys())
+        yearStart = int(years[0])
+        yearEnd = int(years[len(years)-1])
+
+        for key, value in monthly.items():
+            if(int(key) >= start-1 and int(key) <= end+1):
+                if(int(key) >= start and int(key) <= end):
+                    result[key] = []
+                for monthKey, monthValue in value.items():
+                    #if(key in result.keys()):
+                        #result[key][monthKey] = {
+                            #'smoothedMean':0
+                        #}
+                    months.append(float(monthValue['total']))
+
+        if(start > yearStart and end+1 == yearEnd):
+            for i in range(12, len(months) -10):
+                means.append((0.5*months[i-6] + months[i-5] + months[i-4] + months[i-3] + months[i-2] + months[i-1] + months[i] + months[i+1]+ months[i+2]+ months[i+3]+ months[i+4]+ months[i+5]+ months[i+6]*0.5)/12)
+        elif(start > yearStart and end < yearEnd):
+            for i in range(12, len(months) -12):
+                means.append((0.5*months[i-6] + months[i-5] + months[i-4] + months[i-3] + months[i-2] + months[i-1] + months[i] + months[i+1]+ months[i+2]+ months[i+3]+ months[i+4]+ months[i+5]+ months[i+6]*0.5)/12)    
+        elif(start == yearStart and end < yearEnd):
+            for i in range(6, len(months) -12):
+                means.append((0.5*months[i-6] + months[i-5] + months[i-4] + months[i-3] + months[i-2] + months[i-1] + months[i] + months[i+1]+ months[i+2]+ months[i+3]+ months[i+4]+ months[i+5]+ months[i+6]*0.5)/12)
+        elif(start > yearStart and end == yearEnd):
+            for i in range(12, len(months) -6):
+                means.append((0.5*months[i-6] + months[i-5] + months[i-4] + months[i-3] + months[i-2] + months[i-1] + months[i] + months[i+1]+ months[i+2]+ months[i+3]+ months[i+4]+ months[i+5]+ months[i+6]*0.5)/12)
+        else:
+            for i in range(6, len(months) -6):
+                means.append((0.5*months[i-6] + months[i-5] + months[i-4] + months[i-3] + months[i-2] + months[i-1] + months[i] + months[i+1]+ months[i+2]+ months[i+3]+ months[i+4]+ months[i+5]+ months[i+6]*0.5)/12)
+
+       
+
+        for key, value in result.items():
+            if(int(key) == yearStart):
+                for i in range(6, 12):
+                    result[key].append(means.pop(0))
+            elif(int(key) == yearEnd):
+                for i in range(4):
+                    result[key].append(means.pop(0))
+            else:
+                for i in range(12):
+                    result[key].append(means.pop(0))
+            #for monthKey, monthValue in value.items():
+                #result[key][monthKey]['smoothedMean'] = means.pop(0)
+
+        return result
+    
+    else:
+        raise Exception('Years out of range')
+
+
+def dataForGraph(daily, monthly, start, end):
+    if(str(start) in daily.keys() and str(end) in daily.keys()):
+        dayY = []
+        monthY = []
+        for key, value in daily.items():
+            if(int(key) >= start and int(key) <= end):
+                for monthKey, monthValue in value.items():
+                    for dayKey, dayValue in monthValue.items():
+                        dayY.append(int(dayValue['total']))
+
+
+
+        for key, value in monthly.items():
+            if(int(key) >= start and int(key) <= end):
+                for monthKey, monthValue in value.items():
+                    monthY.append(float(monthValue['total']))
+
+        smoothed = smoothedMeanByInterval(start,end,monthly)
+        smoothedY = []
+        for key, value in smoothed.items():
+            smoothedY.extend(value)
+
+        return {
+            'day':dayY,
+            'month':monthY,
+            'smoothed':smoothedY,
+            'start':start,
+            'end':end
+        }
+    else:
+        raise Exception('Years out of range')
+
+def createGraph(data):
+    fig, ax = plt.subplots()
+    
+    #creating first plot
+    ax.set_aspect('auto')
+    line1 = ax.plot(data['day'], linewidth=.2, color="y", label="Daily Observations")
+    
+    #ax.set_xticklabels(range(data['start'], data['end'], 5), rotation=90)
+    #ax.set_xticklabels(ax.get_xticklabels(),rotation=90)
+    ax.set_xticklabels([])
+    #numTicks = math.floor((data['end'] - data['start'])/10)
+    #ax.xaxis.set_major_locator(plt.MaxNLocator(numTicks))
+    
+    #ax.legend(loc=1)
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    
+    #creating second plot
+    ax2 = ax.twiny()
+    line2=ax2.plot(data['month'], linewidth=.5, color="b", label="Monthly Means")
+    
+    ax2.set_xticklabels([])
+    
+    
+    
+    #ax2.legend(loc=2)
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    
+    #creating third plot
+    ax3 = ax2.twiny()
+    line3=ax3.plot(data['smoothed'], linewidth=2, color="r", label="Smoothed mean")
+    #period = [format(i) for i in range(data['start'], data['end'])]
+    
+    ax3.set_xticklabels([])
+    
+    ax3.tick_params(
+    axis='x',          # changes apply to the x-axis
+    which='both',      # both major and minor ticks are affected
+    bottom=False,      # ticks along the bottom edge are off
+    top=False,         # ticks along the top edge are off
+    labelbottom=False) 
+    
+    ax2.tick_params(
+    axis='x',          # changes apply to the x-axis
+    which='both',      # both major and minor ticks are affected
+    bottom=False,      # ticks along the bottom edge are off
+    top=False,         # ticks along the top edge are off
+    labelbottom=False)
+    
+    
+    
+    #criando legendas
+    #ax3.legend(loc=2)
+    fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    
+    lins = line1+line2+line3
+    labs = [l.get_label() for l in lins]
+    ax.legend(lins,labs,loc=0)
+    
+    plt.xticks(rotation=45)
+
+    now = datetime.datetime.now()
+
+    saveTitle = 'plotfig-' + str(now.day) + '-' + str(now.hour) + str(now.second) + '.png'
+
+    plt.savefig(saveTitle)
+
+    return saveTitle

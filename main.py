@@ -16,9 +16,6 @@ CLEAR_COMMAND = configuration['CLEAR'][platform.system()]
 #----------------------------------------------------------------------------------------
 
 
-
-
-
         
 if __name__ == '__main__':
     os.system(CLEAR_COMMAND)
