@@ -30,25 +30,28 @@ def maxMinMean(mode):
     start = int(input('Digite o ano de início: '))
     end = int(input('digite o ano final da consulta: '))
 
-    if(start < 1818 or end > 2022 or end > 1818):
-        while(start < 1818 or end > 2022):
+    if(start < 1749 or end > 2022 or start > end):
+        while(start < 1749 or end > 2022 or start > end):
+            os.system(CLEAR_COMMAND)
             print('Os anos selecionados estão fora do range de anos')
             print('Digite anos entre 1818 e 2022')
             start = int(input('Digite o ano de início: '))
             end = int(input('digite o ano final da consulta: '))
             
-    
+    os.system(CLEAR_COMMAND)
     print('No intervalo dado, os resultados foram os seguintes:')
     if(mode == 'max'):
         data = starFunctions.maxMeanByInterval(start, end, MONTHLY)
         print(f"Ano do máximo: {data['year']}")
         print(f"Mês de máximo: {data['month']}")
         print(f"Total de manchas: {data['max']}")
+        input('Aperta qualquer tecla para continuar')
     else:
         data = starFunctions.minMeanByInterval(start, end, MONTHLY)
         print(f"Ano do mínimo: {data['year']}")
         print(f"Mês de mínimo: {data['month']}")
         print(f"mínimo de manchas: {data['min']}")
+        input('Aperte qualquer tecla para continuar')
 
 #-----------------------------------------------------------------
 
@@ -64,6 +67,7 @@ def menuMaxMin(mode):
 
     if(start < 1818 or end > 2022 or startMonth < 1 or startMonth > 12 or endMonth < 1 or endMonth > 12 or end > 1818):
         while(start < 1818 or end > 2022):
+            os.system(CLEAR_COMMAND)
             print('Os anos selecionados estão fora do range de anos')
             print('Digite anos entre 1818 e 2022')
             start = int(input('Digite o ano de início: '))
@@ -73,18 +77,22 @@ def menuMaxMin(mode):
             
     data = starFunctions.maxMinByInterval(start, end, startMonth, endMonth, DAILY)
 
-
+    os.system(CLEAR_COMMAND)
     print('No intervalo dado, os resultados foram os seguintes:')
     if(mode == 'max'):
         print(f"Ano do máximo: {data['maximum']['year']}")
         print(f"Mês de máximo: {data['maximum']['month']}")
         print(f"Dia de máximo: {data['maximum']['day']}")
         print(f"Total de manchas: {data['maximum']['max']}")
+        input('Aperte qualquer tecla para continuar')
     else:
         print(f"Ano do mínimo: {data['minimum']['year']}")
         print(f"Mês de mínimo: {data['minimum']['month']}")
         print(f"Dia de mínimo: {data['minimum']['day']}")
         print(f"mínimo de manchas: {data['minimum']['minimum']}")
+        input('Aperte qualquer tecla para continuar')
+        os.system(CLEAR_COMMAND)
+        
 
 
 
@@ -95,6 +103,7 @@ def menuConsulta():
     option = 9999
     os.system(CLEAR_COMMAND)
     while(option != 6):
+        os.system(CLEAR_COMMAND)
         print('DIGITE A OPÇÃO DE CONSULTA')
         print('--------------------------------------')
         print('1 - Máximo de manchas solares diárias em determinado período de anos')
@@ -105,26 +114,62 @@ def menuConsulta():
         print('6 - Sair')
         option = int(input('Digite a opção: '))
 
+        
 
         if(option == 1):
             menuMaxMin('max')
+            os.system(CLEAR_COMMAND)
         elif(option == 2):
             menuMaxMin('min')
+            os.system(CLEAR_COMMAND)
         elif(option == 3):
             maxMinMean('max')
+            os.system(CLEAR_COMMAND)
         elif(option == 4):
             maxMinMean('min')
+            os.system(CLEAR_COMMAND)
         elif(option == 5):
             menuPrincipal()
+            os.system(CLEAR_COMMAND)
         elif(option == 6):
             sys.exit()
+        else:
+            print('Opção não existente')
+            input('Aperte qualquer tecla para continuar')
+            os.system(CLEAR_COMMAND)
+        os.system(CLEAR_COMMAND)
 #-----------------------------------------------------------------
+
+#------------------------------------------------------------------
+#FUNÇÕES NECESSÁRIAS PARA GERAR GRÁFICO
+
+def plotGraphMenu():
+    os.system(CLEAR_COMMAND)
+    start = int(input('Digite o ano de início do gráfico: '))
+    end = int(input('Digite o ano final do gráfico: '))
+
+    if(start > end or start < 1818 or end > 2022):
+        print('Anos fora do limite, digite anos entre 1818 e 2022.')
+        while(start > end or start < 1818 or end > 2022):
+                os.system(CLEAR_COMMAND)
+                print('Anos fora do limite, digite anos entre 1818 e 2022.')
+                start = int(input('Digite o ano de início do gráfico: '))
+                end = int(input('Digite o ano final do gráfico: '))
+    
+    data = starFunctions.dataForGraph(DAILY, MONTHLY, start, end)
+    title = starFunctions.createGraph(data)
+
+    print(f'O gráfico foi salvo com o título {title}')
+    input('Aperte Enter para continuar')
+
+#------------------------------------------------------------------
 
 #-----------------------------------------------------------------
 def menuPrincipal():
     option = 0
     os.system(CLEAR_COMMAND)
     while(option != 3):
+        os.system(CLEAR_COMMAND)
         print('BEM VINDO AO SISTEMA DE OBSERVAÇÃO DE MANCHAS SOLARES')
         print('------------------------------------------------------')
         print('SELECIONE UMA DAS OPÇÕES NO MENU')
@@ -138,8 +183,14 @@ def menuPrincipal():
         option = int(input('Digite a opção desejada:'))
         if(option == 1):
             menuConsulta()
-        if(option == 3):
+        elif(option == 2):
+            plotGraphMenu()
+        elif(option == 3):
             sys.exit()
+        else:
+            print('Opção não existente')
+            input('Aperte qualquer tecla para continuar')
+            os.system(CLEAR_COMMAND)
 
 #-----------------------------------------------------------------
 
